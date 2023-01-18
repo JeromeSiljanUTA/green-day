@@ -47,6 +47,7 @@ fourth, total = sliding_window(df["Green"], 4)
 
 print(f"Total number of 3 green days in a row: {total}")
 print(f"Total number of 4th green day given 3 green days in a row: {fourth}")
+print(f"Percentage: {fourth/total}")
 
 pie_df = pd.DataFrame({"total": [total], "fourth": [fourth]})
 
