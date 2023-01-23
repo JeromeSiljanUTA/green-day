@@ -67,13 +67,27 @@ def get_results(num_consecutive_days, green_df):
     """
     green_df.dropna(inplace=True)
     runs, total = sliding_window(green_df, num_consecutive_days, consecutive)
-    chance = runs / total
-    return chance, runs
+    try:
+        chance = runs / total
+        return chance, runs, num_consecutive_days
+    except ZeroDivisionError:
+        return 0, 0, 0
 
 
-multi = yf.Tickers("AAPL TSLA")
+ticker_dict = {
+    "WMT": None,
+    "AMZN": None,
+    "AAPL": None,
+    "CVS": None,
+    "TM": None,
+    "VWAGY": None,
+}
+multi = yf.Tickers(" ".join(ticker_dict.keys()))
 df = multi.history("max")
 df = df["Close"]
-for col_num, item in enumerate(df.items()):
-    df[f"Green {item[0]}"] = df[item[0]].diff() > 0
-    print(get_results(4, df[f"Green {item[0]}"]))
+
+for ticker in ticker_dict:
+    df[f"Green {ticker}"] = df[ticker].diff() > 0
+    ticker_dict[ticker] = [
+        get_results(num, df[f"Green {ticker}"]) for num in range(2, 8)
+    ]
