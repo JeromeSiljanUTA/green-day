@@ -18,40 +18,29 @@ df = aapl.history("max")
 df["Green"] = df["Close"].diff() > 0
 
 
-def three_green(window, total, fourth):
+def consecutive(window, total, runs):
     if all(day for day in window[0:-1]):
         if window[-1]:
-            return total + 1, fourth + 1
+            return total + 1, runs + 1
         else:
-            return total + 1, fourth
+            return total + 1, runs
     else:
-        return total, fourth
+        return total, runs
 
 
 def sliding_window(elements, window_size):
     total = 0
-    fourth = 0
+    runs = 0
     length = len(elements)
     if length <= window_size:
         return elements
     for idx, row in enumerate(elements):
         if idx < length - window_size:
-            total, fourth = three_green(
-                elements[idx : idx + window_size], total, fourth
-            )
-    return fourth, total
+            total, runs = consecutive(elements[idx : idx + window_size], total, runs)
+    return runs, total
 
 
-fourth, total = sliding_window(df["Green"], 4)
-
-print(f"Total number of 3 green days in a row: {total}")
-print(f"Total number of 4th green day given 3 green days in a row: {fourth}")
-print(f"Percentage: {fourth/total}")
-
-pie_df = pd.DataFrame({"total": [total], "fourth": [fourth]})
-
-data = [fourth, total - fourth]
-keys = ["True", "False"]
-plt.title("Green day given as 4th consecutive green day")
-plt.pie(data, labels=keys)
-plt.show()
+def show_results(num_consecutive_days):
+    runs, total = sliding_window(df["Green"], num_consecutive_days)
+    percentage = runs / total
+    return percentage, runs
