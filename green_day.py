@@ -15,13 +15,12 @@ aapl = yf.Ticker("AAPL")
 
 df = aapl.history("max")
 
-df = df[["Close"]]
 df["Green"] = df["Close"].diff() > 0
 
 
 def three_green(window, total, fourth):
-    if window[0] & window[1] & window[2]:
-        if window[3]:
+    if all(day for day in window[0:-1]):
+        if window[-1]:
             return total + 1, fourth + 1
         else:
             return total + 1, fourth
